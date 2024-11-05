@@ -38,6 +38,7 @@ async function displaySongs() {
     const songs = await fetchSongs();
     const songList = document.getElementById('songList');
     songList.innerHTML = ''; // Clear the list before adding new items
+
     for (let i = 0; i < songs.length; i++) { // Start from 0 to include all rows
         const [title, artist] = songs[i];
         const spotifyTrack = await searchSpotify(title, artist);
@@ -52,7 +53,6 @@ async function displaySongs() {
                     <strong>${name}</strong>
                     <span>${artists.map(a => a.name).join(', ')}</span>
                 </div>
-                <a class="link" href="https://open.spotify.com/track/${spotifyTrack.id}" target="_blank">🔗</a>
             `;
         } else {
             notFoundSongs.push({ title, artist });
@@ -65,30 +65,33 @@ async function displaySongs() {
 function displayNotFoundSongs() {
     const notFoundList = document.getElementById('notFoundList');
     notFoundList.innerHTML = ''; // Clear the list before adding new items
+
     notFoundSongs.forEach(song => {
         const notFoundItem = document.createElement('div');
         notFoundItem.classList.add('not-found-item');
         notFoundItem.innerHTML = `
-            <div class="song-item">
-                <img class="cover" src="https://via.placeholder.com/50" alt="${song.title}"> <!-- Placeholder Bild für nicht gefundene Songs -->
-                <div class="song-info">
-                    <strong>${song.title}</strong> - ${song.artist}<br>
-                    <a href="#">Manueller Link</a>
-                </div>
+            <div class="song-info">
+                <strong>${song.title}</strong> - ${song.artist}
             </div>
         `;
         notFoundList.appendChild(notFoundItem);
     });
 }
 
-document.getElementById('notFoundButton').addEventListener('click', () => {
-    const notFoundPopover = document.getElementById('notFoundPopover');
-    notFoundPopover.style.display = 'block'; // Show the popover
+document.getElementById('foundTab').addEventListener('click', () => {
+    document.getElementById('songList').classList.remove('hidden');
+    document.getElementById('notFoundList').classList.add('hidden');
+    document.getElementById('foundTab').classList.add('active');
+    document.getElementById('notFoundTab').classList.remove('active');
+    document.querySelector('.tab-slider').style.left = '0'; // Slider anpassen
 });
 
-document.getElementById('closePopover').addEventListener('click', () => {
-    const notFoundPopover = document.getElementById('notFoundPopover');
-    notFoundPopover.style.display = 'none'; // Hide the popover
+document.getElementById('notFoundTab').addEventListener('click', () => {
+    document.getElementById('notFoundList').classList.remove('hidden');
+    document.getElementById('songList').classList.add('hidden');
+    document.getElementById('notFoundTab').classList.add('active');
+    document.getElementById('foundTab').classList.remove('active');
+    document.querySelector('.tab-slider').style.left = '50%'; // Slider anpassen
 });
 
-window.onload = displaySongs;
+displaySongs();

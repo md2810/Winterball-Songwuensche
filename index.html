@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Suche</title>
+    <title>Winterball Songwünsche Dashboard</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="header">
-    <h1>Song Suche</h1>
+    <h1>Winterball Songw&uumlnsche Dashboard</h1>
+</div>
+<div class="tabs-container">
+    <div class="tabs">
+        <button class="tab-button active" id="foundTab">Automatisch gefunden</button>
+        <button class="tab-button" id="notFoundTab">Nicht gefunden</button>
+        <div class="tab-slider"></div>
+    </div>
 </div>
 <div class="song-list" id="songList"></div>
-<div class="popover" id="notFoundPopover">
-    <button class="close-button" id="closePopover">✖</button>
-    <div class="popover-content" id="notFoundList"></div>
-</div>
-<button class="not-found-button" id="notFoundButton">
-    <span class="material-icons">warning</span>
-</button>
+<div class="not-found-list hidden" id="notFoundList"></div>
 
 <script src="script.js"></script>
 </body>

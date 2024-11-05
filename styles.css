@@ -6,18 +6,64 @@ body {
     padding: 20px;
     overflow: hidden; /* Verhindert Scrollen */
 }
+
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.song-list {
+
+.tabs-container {
+    position: relative;
+    margin: 20px 0;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-between;
+    background-color: transparent; /* Transparente Hintergrundfarbe */
+    border: 2px solid #ffffff; /* Weiße Randfarbe */
+    border-radius: 50px; /* Pille-Form */
+    overflow: hidden; /* Rundung nicht anzeigen */
+    height: 40px; /* Höhe für die Pille */
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    background-color: transparent; /* Transparente Hintergrundfarbe */
+    color: #ffffff;
+    cursor: pointer;
+    border: none; /* Kein Rand */
+    transition: color 0.3s;
+    position: relative; /* Für den Slider */
+    z-index: 1; /* Über dem Slider */
+}
+
+.tab-button.active {
+    color: #121212; /* Dunkle Schriftfarbe für aktiven Tab */
+}
+
+.tab-slider {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%; /* Größe des Sliders */
+    height: 100%;
+    background-color: #ffffff; /* Hintergrundfarbe des aktiven Tabs */
+    transition: left 0.3s; /* Animation beim Wechsel */
+    z-index: 0; /* Unter dem Tab-Text */
+    border-radius: 50px; /* Rundung für die Pille */
+}
+
+.song-list, .not-found-list {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
     overflow-y: auto; /* Scrollen innerhalb der Liste erlauben */
-    height: calc(90vh - 80px); /* Höhe anpassen */
+    height: calc(90vh - 140px); /* Höhe anpassen */
 }
+
 .song-item, .not-found-item {
     background-color: #1f1f1f;
     border-radius: 16px; /* Stärkere Abrundung */
@@ -27,79 +73,24 @@ body {
     align-items: center; /* Vertikale Ausrichtung */
     justify-content: flex-start; /* Links ausrichten */
 }
+
 .cover {
     width: 50px;
     height: 50px;
     border-radius: 8px;
     margin-right: 15px;
 }
+
 .hidden {
     display: none;
 }
-.not-found-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #1f1f1f; /* gleiche Farbe wie die Panels */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-.not-found-button .material-icons {
-    color: #ff9800; /* Dunkelorange */
-}
-.popover {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100vw; /* Breite auf 100% des Sichtbereichs */
-    height: 90%;
-    background: rgba(31, 31, 31, 0.9);
-    display: none; /* Initially hidden */
-    border-top-left-radius: 24px; /* Stärkere Abrundung */
-    border-top-right-radius: 24px; /* Stärkere Abrundung */
-    backdrop-filter: blur(5px); /* Blur hinter dem Popover */
-    z-index: 1000;
-    padding: 20px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-}
-.popover-content {
-    max-height: calc(80% - 40px); /* Höhe anpassen, um Platz für den Schließen-Button zu schaffen */
-    overflow-y: auto; /* Allow scrolling */
-    width: 100%; /* Breite auf 100% setzen */
-}
+
 .song-info {
     display: flex;
     flex-direction: column; /* Vertikale Anordnung für Titel und Künstler */
     margin-left: 5px; /* Kleinere Abstände zwischen Titel und Künstler */
 }
-.link {
-    margin-left: auto; /* Links-Symbol nach rechts */
-}
+
 .song-info strong {
     margin-bottom: 2px; /* Geringerer Abstand zwischen Titel und Künstler */
-}
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #ff9800; /* Dunkelorange */
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    font-size: 20px; /* Größere Schrift für das X */
-    z-index: 1001; /* Sicherstellen, dass der Button über dem Popover ist */
 }
