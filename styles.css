@@ -1,107 +1,105 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #121212;
     color: #ffffff;
-}
-
-.container {
+    margin: 0;
     padding: 20px;
+    overflow: hidden; /* Verhindert Scrollen */
 }
-
-input[type="text"] {
-    width: 300px;
-    padding: 10px;
-    margin-right: 10px;
-    border: none;
-    border-radius: 5px;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.song-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Scrollen innerhalb der Liste erlauben */
+    height: calc(90vh - 80px); /* Höhe anpassen */
 }
-
-.manual-list-button {
+.song-item, .not-found-item {
+    background-color: #1f1f1f;
+    border-radius: 16px; /* Stärkere Abrundung */
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center; /* Vertikale Ausrichtung */
+    justify-content: flex-start; /* Links ausrichten */
+}
+.cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+.hidden {
+    display: none;
+}
+.not-found-button {
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: #1db954; /* Farbe passend zu den Panels */
-}
-
-#songsContainer {
-    margin-top: 20px;
-}
-
-.song-panel {
-    display: flex;
-    align-items: center;
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.song-panel img {
-    border-radius: 10px;
-    width: 64px;
-    height: 64px;
-    margin-right: 15px;
-}
-
-.song-title {
-    font-weight: bold;
-}
-
-.popover {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 90%;
-    background-color: rgba(30, 30, 30, 0.95);
-    border-radius: 10px 10px 0 0;
-    padding: 20px;
-    overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
-}
-
-.close-button {
-    background-color: #1db954; /* Farbe passend zu den Panels */
-    color: white;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    border: none;
+    background-color: #1f1f1f; /* gleiche Farbe wie die Panels */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+.not-found-button .material-icons {
+    color: #ff9800; /* Dunkelorange */
+}
+.popover {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw; /* Breite auf 100% des Sichtbereichs */
+    height: 90%;
+    background: rgba(31, 31, 31, 0.9);
+    display: none; /* Initially hidden */
+    border-top-left-radius: 24px; /* Stärkere Abrundung */
+    border-top-right-radius: 24px; /* Stärkere Abrundung */
+    backdrop-filter: blur(5px); /* Blur hinter dem Popover */
+    z-index: 1000;
+    padding: 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+}
+.popover-content {
+    max-height: calc(80% - 40px); /* Höhe anpassen, um Platz für den Schließen-Button zu schaffen */
+    overflow-y: auto; /* Allow scrolling */
+    width: 100%; /* Breite auf 100% setzen */
+}
+.song-info {
+    display: flex;
+    flex-direction: column; /* Vertikale Anordnung für Titel und Künstler */
+    margin-left: 5px; /* Kleinere Abstände zwischen Titel und Künstler */
+}
+.link {
+    margin-left: auto; /* Links-Symbol nach rechts */
+}
+.song-info strong {
+    margin-bottom: 2px; /* Geringerer Abstand zwischen Titel und Künstler */
+}
+.close-button {
     position: absolute;
     top: 10px;
     right: 10px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #1db954; /* Farbe passend zu den Panels */
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ff9800; /* Dunkelorange */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    font-size: 20px; /* Größere Schrift für das X */
+    z-index: 1001; /* Sicherstellen, dass der Button über dem Popover ist */
 }

@@ -1,14 +1,21 @@
-const clientId = 'c6ac848d1a84407fac1ef488542331eb';
-const clientSecret = '2715776b65f94f918dc9a9672e3a4d41';
-const googleApiKey = 'AIzaSyDMaLLPOkf6U-bZn2tni5oYT3JOE6gLt4g'; // Dein Google API-Key
-const spreadsheetId = '1f7aJpZMk3HV-aSmBlL1p-Zs7FdRMJ2BfvLbjeq58_lw'; // ID des Google Sheets
+const SHEET_ID = '1v_l6HE6zcx22ADXNJHbcn3FwJ95I3TcaH9lhN2qkNVY';
+const GOOGLE_API_KEY = 'AIzaSyDMaLLPOkf6U-bZn2tni5oYT3JOE6gLt4g';
+const SPOTIFY_CLIENT_ID = 'c6ac848d1a84407fac1ef488542331eb';
+const SPOTIFY_CLIENT_SECRET = 'd5206b845b2840ceb64de514f6e0549e';
+const notFoundSongs = [];
 
-async function getAccessToken() {
+async function fetchSongs() {
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Songs!B:C?key=${GOOGLE_API_KEY}`);
+    const data = await response.json();
+    return data.values.slice(1); // Ignore the first row
+}
+
+async function fetchSpotifyToken() {
     const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
+            'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET),
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: 'grant_type=client_credentials'
     });
@@ -16,82 +23,72 @@ async function getAccessToken() {
     return data.access_token;
 }
 
-async function searchSongs(query) {
-    const accessToken = await getAccessToken();
-    const response = await fetch(`https://api.spotify.com/v1/search?query=${encodeURIComponent(query)}&type=track`, {
-        method: 'GET',
+async function searchSpotify(songTitle, artist) {
+    const token = await fetchSpotifyToken();
+    const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(songTitle)}%20artist:${encodeURIComponent(artist)}&type=track`, {
         headers: {
-            'Authorization': 'Bearer ' + accessToken
+            'Authorization': `Bearer ${token}`
         }
     });
-    return response.json();
-}
-
-async function fetchManualList() {
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/ManuelleListe?key=${googleApiKey}`);
     const data = await response.json();
-    return data.values || [];
+    return data.tracks.items[0]; // Returning the first found track
 }
 
-function displaySongs(songs) {
-    const songsContainer = document.getElementById('songsContainer');
-    songsContainer.innerHTML = '';
+async function displaySongs() {
+    const songs = await fetchSongs();
+    const songList = document.getElementById('songList');
+    songList.innerHTML = ''; // Clear the list before adding new items
+    for (let i = 0; i < songs.length; i++) { // Start from 0 to include all rows
+        const [title, artist] = songs[i];
+        const spotifyTrack = await searchSpotify(title, artist);
 
-    songs.tracks.items.forEach(track => {
-        const songPanel = document.createElement('div');
-        songPanel.className = 'song-panel';
+        const songItem = document.createElement('div');
+        songItem.classList.add('song-item');
+        if (spotifyTrack) {
+            const { name, artists, album } = spotifyTrack;
+            songItem.innerHTML = `
+                <img class="cover" src="${album.images[0].url}" alt="${name}">
+                <div class="song-info">
+                    <strong>${name}</strong>
+                    <span>${artists.map(a => a.name).join(', ')}</span>
+                </div>
+                <a class="link" href="https://open.spotify.com/track/${spotifyTrack.id}" target="_blank">🔗</a>
+            `;
+        } else {
+            notFoundSongs.push({ title, artist });
+        }
+        songList.appendChild(songItem);
+    }
+    displayNotFoundSongs();
+}
 
-        const songImage = document.createElement('img');
-        songImage.src = track.album.images[0].url;
-        songPanel.appendChild(songImage);
-
-        const songDetails = document.createElement('div');
-        songDetails.innerHTML = `
-            <div class="song-title">${track.name}</div>
-            <div>${track.artists.map(artist => artist.name).join(', ')}</div>
+function displayNotFoundSongs() {
+    const notFoundList = document.getElementById('notFoundList');
+    notFoundList.innerHTML = ''; // Clear the list before adding new items
+    notFoundSongs.forEach(song => {
+        const notFoundItem = document.createElement('div');
+        notFoundItem.classList.add('not-found-item');
+        notFoundItem.innerHTML = `
+            <div class="song-item">
+                <img class="cover" src="https://via.placeholder.com/50" alt="${song.title}"> <!-- Placeholder Bild für nicht gefundene Songs -->
+                <div class="song-info">
+                    <strong>${song.title}</strong> - ${song.artist}<br>
+                    <a href="#">Manueller Link</a>
+                </div>
+            </div>
         `;
-        songPanel.appendChild(songDetails);
-
-        const linkButton = document.createElement('a');
-        linkButton.href = track.external_urls.spotify;
-        linkButton.target = '_blank';
-        linkButton.innerHTML = '🔗';
-        songPanel.appendChild(linkButton);
-
-        songsContainer.appendChild(songPanel);
+        notFoundList.appendChild(notFoundItem);
     });
 }
 
-function displayManualList(manualSongs) {
-    const manualListTableBody = document.getElementById('manualListTable').getElementsByTagName('tbody')[0];
-    manualListTableBody.innerHTML = '';
-
-    manualSongs.forEach(song => {
-        const row = manualListTableBody.insertRow();
-        const titleCell = row.insertCell(0);
-        const artistCell = row.insertCell(1);
-        const linkCell = row.insertCell(2);
-        
-        titleCell.textContent = song[0]; // Songtitel
-        artistCell.textContent = song[1]; // Künstler
-        linkCell.innerHTML = `<a href="${song[2]}" target="_blank">🔗</a>`; // Link
-    });
-}
-
-document.getElementById('searchButton').addEventListener('click', async () => {
-    const songInput = document.getElementById('songInput').value;
-    const songs = await searchSongs(songInput);
-    displaySongs(songs);
-});
-
-document.getElementById('manualListButton').addEventListener('click', async () => {
-    const popover = document.getElementById('manualListPopover');
-    const manualSongs = await fetchManualList();
-    displayManualList(manualSongs);
-    popover.style.display = 'block';
+document.getElementById('notFoundButton').addEventListener('click', () => {
+    const notFoundPopover = document.getElementById('notFoundPopover');
+    notFoundPopover.style.display = 'block'; // Show the popover
 });
 
 document.getElementById('closePopover').addEventListener('click', () => {
-    const popover = document.getElementById('manualListPopover');
-    popover.style.display = 'none';
+    const notFoundPopover = document.getElementById('notFoundPopover');
+    notFoundPopover.style.display = 'none'; // Hide the popover
 });
+
+window.onload = displaySongs;
