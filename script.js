@@ -76,9 +76,13 @@ function displayNotFoundSongs() {
         const notFoundItem = document.createElement('div');
         notFoundItem.classList.add('not-found-item');
         notFoundItem.innerHTML = `
-            <div class="song-info">
-                <strong>${song.title}</strong> - ${song.artist}
-            </div>
+                <a href="${song.manualLink}" target="_blank">
+                    <img class="cover" src="placeholder.png">
+                </a>
+                <div class="song-info">
+                    <strong>${song.title}</strong>
+                    <span>${song.artist}</span>
+                </div>
         `;
         notFoundList.appendChild(notFoundItem);
     });
