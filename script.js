@@ -39,27 +39,33 @@ async function displaySongs() {
     const songList = document.getElementById('songList');
     songList.innerHTML = ''; // Clear the list before adding new items
 
+    notFoundSongs.length = 0; // Leere das Array für nicht gefundene Songs
+
     for (let i = 0; i < songs.length; i++) { // Start from 0 to include all rows
-        const [title, artist] = songs[i];
+        const [title, artist, manualLink] = songs[i]; // Manual link from column D
         const spotifyTrack = await searchSpotify(title, artist);
 
-        const songItem = document.createElement('div');
-        songItem.classList.add('song-item');
         if (spotifyTrack) {
-            const { name, artists, album } = spotifyTrack;
+            const { name, artists, album, external_urls } = spotifyTrack;
+            const songItem = document.createElement('div');
+            songItem.classList.add('song-item');
             songItem.innerHTML = `
-                <img class="cover" src="${album.images[0].url}" alt="${name}">
+                <a href="${external_urls.spotify}" target="_blank" class="cover-container">
+                    <img class="cover" src="${album.images[0].url}" alt="${name}">
+                </a>
                 <div class="song-info">
                     <strong>${name}</strong>
                     <span>${artists.map(a => a.name).join(', ')}</span>
                 </div>
             `;
+            songList.appendChild(songItem);
         } else {
-            notFoundSongs.push({ title, artist });
+            // Wenn der Song nicht gefunden wurde, speichere ihn im Array
+            notFoundSongs.push({ title, artist, manualLink });
         }
-        songList.appendChild(songItem);
     }
-    displayNotFoundSongs();
+
+    displayNotFoundSongs(); // Zeige die nicht gefundenen Songs separat an
 }
 
 function displayNotFoundSongs() {
